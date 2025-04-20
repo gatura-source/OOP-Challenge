@@ -1,69 +1,60 @@
-import time
+
 
 class Pet:
-    def __init__(self, name):
+
+    def __init__(self, name: str, hunger: int = 0, energy: int = 10, happiness: int = 10):
         self.name = name
-        self.hunger = 5
-        self.energy = 5
-        self.happiness = 5
+        self.hunger = hunger
+        self.energy = energy
+        self.happiness = happiness
         self.tricks = []
 
-    # Let each group member add their methods here
-
     def eat(self):
-     """
-     Reduces hunger by 3, but never lets it go below 0.
-     increases happiness by 1 but doesn't go beyond 10
-     """
-     if self.hunger >= 3:
-        self.hunger -= 3
-     else:
-         self.hunger = 0
-     self.happiness = min(self.happiness + 1, 10)
-     time.sleep(2)
-     print(f"{self.name} has eaten🎉.")
-     time.sleep(1)
+        """ reduces hunger by 3 points (but not below 0), and increases happiness by 1."""
+        self.attr_op(self, "hunger", "-", 3)
+        self.attr_op(self, "happiness", "+", 1)
 
     def sleep(self):
-     """adds energy by 5 but doesn't go beyond 10"""
-     self.energy = min(self.energy + 5, 10)
-     time.sleep(1)
-     print(f"{self.name} has slept💤💤.")
+        """ increases energy by 5 points (but not above 10)."""
+        self.attr_op(self, "energy", "+", 5)
 
     def play(self):
-        """Decreases energy by 2 and increase happiness by 1"""
-        if self.energy >= 2:
-            self.energy -= 2
-            self.happiness = min(self.happiness + 2, 10)
-            self.hunger = min(self.hunger + 1, 10)
-            print("You played with your pet.")
-        else:
-            print(f"{self.name} is too tired to play😔.")
-    
-    def sleep(self):
-        """Increases energy by 5 but doesn't go beyond 10"""
-        self.energy = min(self.energy + 5, 10)
-        print(f"{self.name} has slept.")
+        """decreases energy by 2, increases happiness by 2, and increases hunger by 1."""
+        self.attr_op(self, "energy", "-", 2)
+        self.attr_op(self, "happiness", "+", 2)
+        self.attr_op(self, "hunger", "+", 1)
 
     def get_status(self):
-        """Prints the current status of the pet"""
-        print(f"\n{self.name}'s current status: \n🍚 Hunger: {self.hunger}\n⚡ Energy: {self.energy}\n🐱 Happiness: {self.happiness}\n🎃 Tricks: {', '.join(self.tricks) if self.tricks else f'{self.name} doesn\'t know any tricks yet.'}")
-        time.sleep(5)
+        """ prints the current state of the pet"""
+        print(f"Status\nHappiness: {self.happiness}\nHunger: {self.hunger}\nEnergy: {self.energy}")
 
-    def train(self, trick):
-        """Teach the pet a new trick"""
-        if trick in self.tricks:
-            print(f"{self.name} already knows '{trick}'.")
-        else:
-            self.tricks.append(trick)
-            print(f"\nSuccessfully taught {self.name} the trick '{trick}🎉'!")
-            time.sleep(4)
-            
+    def train(self, trick: str):
+        """ that teaches your pet a new trick and stores it in a list"""
+        self.tricks.append(trick)
+
     def show_tricks(self):
-        # Show the pet's tricks
-        if not self.tricks:
-            print(f"{self.name} doesn't know any tricks yet😔.")
+        """that prints all learned tricks."""
+        print(self.tricks)
+
+    @staticmethod
+    def attr_op(pet, attr: str, op: str, val: int):
+        if hasattr(pet, attr):
+            match op:
+                case "+":
+                    if (getattr(pet, attr) + val) <= 10:
+                        setattr(pet, attr, getattr(pet, attr)+val)
+                    elif (getattr(pet, attr) + 1) <= 10:
+                        setattr(pet, attr, getattr(pet, attr) + 1)
+                    else:
+                        print(f"{pet.name} {attr} at Max")
+                case "-":
+                    if (getattr(pet, attr) - val) > 0:
+                        setattr(pet, attr, getattr(pet, attr)-val)
+                    elif (getattr(pet, attr) - 1) > 0:
+                        setattr(pet, attr, getattr(pet, attr) - 1)
+                    else:
+                        print(f"{pet.name} {attr} at Min")
+                case _:
+                    raise ValueError("Unknown operator")
         else:
-            print(f"\n{self.name}'s tricks:")
-            for i, trick in enumerate(self.tricks, 1):
-                print(f"{i}. 🎃 {trick}")
+            raise AttributeError(f"{pet} has no attribute named {attr}")   
